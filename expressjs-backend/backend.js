@@ -45,8 +45,6 @@ const findUserByNameAndJob = (name, job) => {
 };
 
 
-
-
 app.get("/users/:id", (req, res) => {
   const id = req.params["id"]; //or req.params.id
   let result = findUserById(id);
