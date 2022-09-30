@@ -2,9 +2,12 @@ const { application } = require("express");
 const express = require("express");
 const app = express();
 const port = 5001;
-const cors = require('cors');
 
-app.use(cors);
+//These cors command caused my backend/frontend to not communicate
+//Commenting them out made it work just fine!
+// const cors = require('cors');
+
+// app.use(cors);
 app.use(express.json());
 
 app.get("/", (req, res) => {

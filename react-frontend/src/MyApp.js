@@ -18,21 +18,37 @@ function MyApp() {
   }
 
   useEffect(() => {
-    fectchAll().then((result) => {
-      if (result) 
-          setCharacters(result);
+    fetchAll().then((result) => {
+      if (result) setCharacters(result);
     });
   }, []);
 
-  async function fectchAll() {
+  async function fetchAll() {
     try {
-      const response = await axios.get("http//localhost:5001/users");
+      const response = await axios.get("http://localhost:5001/users");
       return response.data.users_list;
     } catch (error) {
       //just logging errors to the console
       console.log(error);
       return false;
     }
+  }
+
+  async function makePostCall(person) {
+    try {
+      const response = await axios.post("http://localhost:5001/users", person);
+      return response;
+    } catch (error) {
+      console.log(error);
+      return false;
+    }
+  }
+
+  function updateList(person) {
+    makePostCall(person).then((result) => {
+      if (result && result.status === 200)
+        setCharacters([...characters, person]);
+    });
   }
 
   return (
