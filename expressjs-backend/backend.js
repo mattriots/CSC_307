@@ -62,11 +62,18 @@ function findUserById(id) {
   //return users['users_list'].filter( (user) => user['id'] === id);
 }
 
+//Need to work on the ordering of the JSON. but it works
 app.post("/users", (req, res) => {
+  
   const userToAdd = req.body;
+  userToAdd.id = uniqueID().toString();
   addUser(userToAdd);
-  res.status(200).end();
+  res.status(201).end();
 });
+
+function uniqueID(){
+  return Math.floor(Math.random()* Date.now());
+}
 
 function addUser(user) {
   users["users_list"].push(user);
@@ -81,6 +88,7 @@ app.delete("/users", (req, res) => {
 function deleteUser(user) {
   users["users_list"].pop(user);
 }
+
 
 const users = {
   users_list: [
