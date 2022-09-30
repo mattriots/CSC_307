@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Table from "./Table";
 import Form from "./Form";
+import axios from "axios";
 
 function MyApp() {
   const [characters, setCharacters] = useState([]);
@@ -14,6 +15,24 @@ function MyApp() {
 
   function updateList(person) {
     setCharacters([...characters, person]);
+  }
+
+  useEffect(() => {
+    fectchAll().then((result) => {
+      if (result) 
+          setCharacters(result);
+    });
+  }, []);
+
+  async function fectchAll() {
+    try {
+      const response = await axios.get("http//localhost:5001/users");
+      return response.data.users_list;
+    } catch (error) {
+      //just logging errors to the console
+      console.log(error);
+      return false;
+    }
   }
 
   return (
