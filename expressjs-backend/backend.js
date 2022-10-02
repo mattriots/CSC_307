@@ -1,13 +1,10 @@
-const { application } = require("express");
+const { application, response } = require("express");
 const express = require("express");
 const app = express();
 const port = 5001;
+const cors = require("cors");
 
-//These cors command caused my backend/frontend to not communicate
-//Commenting them out made it work just fine!
-// const cors = require('cors');
-
-// app.use(cors);
+app.use(cors());
 app.use(express.json());
 
 app.get("/", (req, res) => {
@@ -38,13 +35,11 @@ const findUserByName = (name) => {
   return users["users_list"].filter((user) => user["name"] === name);
 };
 
-
 const findUserByNameAndJob = (name, job) => {
   return users["users_list"].filter(
     (user) => user["name"] === name && user["job"] === job
   );
 };
-
 
 app.get("/users/:id", (req, res) => {
   const id = req.params["id"]; //or req.params.id
@@ -62,33 +57,45 @@ function findUserById(id) {
   //return users['users_list'].filter( (user) => user['id'] === id);
 }
 
-//Need to work on the ordering of the JSON. but it works
 app.post("/users", (req, res) => {
-  
   const userToAdd = req.body;
   userToAdd.id = uniqueID().toString();
   addUser(userToAdd);
+  var myJson = {};
+  myJson.id = userToAdd.id;
+  myJson.name = userToAdd.name;
+  myJson.job = userToAdd.job;
+  res.send(myJson);
   res.status(201).end();
 });
 
-function uniqueID(){
-  return Math.floor(Math.random()* Date.now());
+function uniqueID() {
+  return Math.floor(Math.random() * Date.now());
 }
 
 function addUser(user) {
   users["users_list"].push(user);
 }
 
-app.delete("/users", (req, res) => {
-  const userToDelete = req.body;
-  deleteUser(userToDelete);
-  res.status(200).end();
+app.delete("/users/:id", (req, res) => {
+  const id = req.params["id"];
+  let userToDelete = findUserById(id);
+  console.log(userToDelete.id);
+  console.log(userToDelete.name);
+  console.log(userToDelete.job);
+  if (userToDelete === undefined || userToDelete.length === 0)
+    res.status(404).send("Resource not found.");
+  else {
+    deleteUser(userToDelete);
+    res.status(204).end();
+  }
 });
 
+
 function deleteUser(user) {
+  console.log("in delete user: " + user.id)
   users["users_list"].pop(user);
 }
-
 
 const users = {
   users_list: [

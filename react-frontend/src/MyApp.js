@@ -7,14 +7,30 @@ function MyApp() {
   const [characters, setCharacters] = useState([]);
 
   function removeOneCharacter(index) {
-    const updated = characters.filter((character, i) => {
-      return i !== index;
+    Delete(index).then((result) => {
+      if (result && result.status === 204) {
+        const updated = characters.filter((character, i) => {
+          return i !== index;
+        });
+        setCharacters(updated);
+      } else if (result.status === 404) {
+        console.log("Resouce not found. Object not deleted");
+      }
     });
-    setCharacters(updated);
   }
 
-  function updateList(person) {
-    setCharacters([...characters, person]);
+  async function Delete(index) {
+    try {
+      console.log("index: " + index)
+       console.log(characters[index].id);
+      return await axios.delete(
+        `http://localhost:5001/users/${characters[index].id}`
+      );
+    } catch (error) {
+      //just logging errors to the console
+      console.log(error);
+      return false;
+    }
   }
 
   useEffect(() => {
@@ -34,21 +50,24 @@ function MyApp() {
     }
   }
 
-  async function makePostCall(person) {
-    try {
-      const response = await axios.post("http://localhost:5001/users", person);
-      return response;
-    } catch (error) {
-      console.log(error);
-      return false;
-    }
-  }
-
   function updateList(person) {
     makePostCall(person).then((result) => {
       if (result && result.status === 201)
         setCharacters([...characters, person]);
     });
+  }
+
+  async function makePostCall(person) {
+    try {
+      return await axios
+        .post("http://localhost:5001/users", person)
+        .then((response) => {
+          setCharacters((characters) => [...characters, response.data]);
+        });
+    } catch (error) {
+      console.log(error);
+      return false;
+    }
   }
 
   return (
