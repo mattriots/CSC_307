@@ -21,8 +21,6 @@ function MyApp() {
 
   async function Delete(index) {
     try {
-      console.log("index: " + index)
-       console.log(characters[index].id);
       return await axios.delete(
         `http://localhost:5001/users/${characters[index].id}`
       );
