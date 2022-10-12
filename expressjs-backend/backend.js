@@ -1,5 +1,6 @@
 const { application, response } = require("express");
 const express = require("express");
+const userServices = require("./models/user-services");
 const app = express();
 const port = 5001;
 const cors = require("cors");
@@ -17,88 +18,91 @@ app.listen(port, () => {
 
 //Get users
 
-app.get("/users", (req, res) => {
+app.get("/users", async (req, res) => {
   const name = req.query.name;
   const job = req.query.job;
-  if (name != undefined && job != undefined) {
-    let result = findUserByNameAndJob(name, job);
-    result = { users_list: result };
-    res.send(result);
-  } else if (name != undefined) {
-    let result = findUserByName(name);
-    result = { users_list: result };
-    res.send(result);
-  } else {
-    res.send(users);
+  try {
+      const result = await userServices.getUsers(name, job);
+      res.send({ users_list: result });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("An error ocurred in the server.");
   }
 });
 
-app.get("/users/:id", (req, res) => {
+app.get("/users/:id", async (req, res) => {
   const id = req.params["id"]; //or req.params.id
-  let result = findUserById(id);
+  let result = await userServices.findUserById(id);
   if (result === undefined || result.length == 0)
     res.status(404).send("Resource not found.");
   else {
-    result = { users_list: result };
-    res.send(result);
+    res.send({ users_list: result });
   }
 });
 
-
-const findUserByName = (name) => {
-  return users["users_list"].filter((user) => user["name"] === name);
-};
-
-const findUserByNameAndJob = (name, job) => {
-  return users["users_list"].filter(
-    (user) => user["name"] === name && user["job"] === job
-  );
-};
-
-function findUserById(id) {
-  return users["users_list"].find((user) => user["id"] === id);
-}
-
-//Add user
-
-app.post("/users", (req, res) => {
-  const userToAdd = req.body;
-  userToAdd.id = uniqueID().toString();
-  addUser(userToAdd);
-  var myJson = {};
-  myJson.id = userToAdd.id;
-  myJson.name = userToAdd.name;
-  myJson.job = userToAdd.job;
-  res.send(myJson);
-  res.status(201).end();
+app.post("/users", async (req, res) => {
+  const user = req.body;
+  const savedUser = await userServices.addUser(user);
+  if (savedUser) res.status(201).send(savedUser);
+  else res.status(500).end();
 });
 
-function uniqueID() {
-  return Math.floor(Math.random() * Date.now());
-}
-
-function addUser(user) {
-  users["users_list"].push(user);
-}
-
-
-//Delete user 
-
-app.delete("/users/:id", (req, res) => {
+app.delete("/users/:id", async (req, res) => {
   const id = req.params.id;
-  let userToDelete = findUserById(id);
+  console.log(id);
+  let userToDelete = await userServices.deleteUser(id);
   if (userToDelete === undefined || userToDelete.length === 0)
     res.status(404).send("Resource not found.");
   else {
-    deleteUser(userToDelete);
     res.status(204).end();
   }
 });
 
+// const findUserByName = (name) => {
+//   return users["users_list"].filter((user) => user["name"] === name);
+// };
 
-function deleteUser(user) {
-users["users_list"] = users["users_list"].filter((e) => e["id"] != user.id);
-}
+// const findUserByNameAndJob = (name, job) => {
+//   return users["users_list"].filter(
+//     (user) => user["name"] === name && user["job"] === job
+//   );
+// };
+
+// function findUserById(id) {
+//   return users["users_list"].find((user) => user["id"] === id);
+// }
+
+//Add user
+
+// app.post("/users", (req, res) => {
+//   const userToAdd = req.body;
+//   userToAdd.id = uniqueID().toString();
+//   addUser(userToAdd);
+//   var myJson = {};
+//   myJson.id = userToAdd.id;
+//   myJson.name = userToAdd.name;
+//   myJson.job = userToAdd.job;
+//   res.send(myJson);
+//   res.status(201).end();
+// });
+
+
+
+
+// function uniqueID() {
+//   return Math.floor(Math.random() * Date.now());
+// }
+
+// function addUser(user) {
+//   users["users_list"].push(user);
+// }
+
+//Delete user
+
+
+// function deleteUser(user) {
+//   users["users_list"] = users["users_list"].filter((e) => e["id"] != user.id);
+// }
 
 //Hardcoded users_list
 
