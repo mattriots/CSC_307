@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Table from "./Table";
 import Form from "./Form";
-import axios from "axios";
-
+import axios from 'axios'
 function MyApp() {
   const [characters, setCharacters] = useState([]);
 
@@ -22,7 +21,7 @@ function MyApp() {
   async function Delete(index) {
     try {
       return await axios.delete(
-        `http://localhost:5001/users/${characters[index].id}`
+        `http://localhost:5001/users/${characters[index]._id}`
       );
     } catch (error) {
       //just logging errors to the console
