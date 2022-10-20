@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const userServices = require("./models/user-services");
 const app = express();
-const port = 5000;
+const port = 5001;
 
 app.use(cors());
 app.use(express.json());
@@ -41,5 +41,5 @@ app.post("/users", async (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`);
+  console.log(`The mongoose is listening at http://localhost:${port}`);
 });

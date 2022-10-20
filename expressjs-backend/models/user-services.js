@@ -1,10 +1,24 @@
 const mongoose = require("mongoose");
 const userModel = require("./user");
+const dotenv = require("dotenv")
+
+dotenv.config({
+  path: "/home/martog/code/learning/school/CSC307/CSC_307/.env"});
 
 mongoose.set("debug", true);
 
 mongoose
-  .connect("mongodb://localhost:27017/users", {
+  .connect("mongodb+srv://" 
+        + process.env.MONGO_USER +
+        ":" +
+        process.env.MONGO_PWD +
+        "@"+
+        process.env.MONGO_CLUSTER +
+        "/"+
+        process.env.MONGO_DB +
+        "?retryWrites=true&w=majority",
+    // "mongodb://localhost:27017/users"
+     {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
